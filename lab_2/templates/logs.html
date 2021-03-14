@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logs</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+</head>
+<body>
+    <div id="app">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-end">
+                    <a class="link-primary" href="/">Home</a> 
+                    <a class="link-primary" href="/logout">Logout</a> 
+                </div>
+            </div>
+            <div class="row" v-if="logs">
+                <div class="col-6 text-center">AUTH</div>
+                <div class="col-6 text-center">DATA ACCESS</div>
+                <div class="col-6">
+                    <div
+                        v-for="item in authLogs"
+                        :key="item.id"
+                        v-text="item.message"
+                        class="alert alert-info">
+
+                    </div>
+                </div> 
+                <div class="col-6">
+                    <div
+                        v-for="item in accessLogs"
+                        :key="item.id"
+                        v-text="item.message"
+                        class="alert alert-info">
+
+                    </div>
+                </div> 
+            </div>
+            <div class="row" v-else>
+                No Items
+            </div>
+        </div>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: function() {
+                return {
+                    logs: [],
+                }
+            },
+            computed: {
+                authLogs() {
+                    return this.logs.filter(item => item.type == 'auth')
+                },
+                accessLogs() {
+                    return this.logs.filter(item => item.type == 'data')
+                }
+            },
+            methods: {
+                loadData() {
+                    fetch('/data/logs', { 
+                        headers: {
+                            'Content-Type': 'application/json;charset=utf-8'
+                        }
+                    }).then(res => {
+                        res.json().then(data => {
+                            if(data.status === 'OK') {
+                                this.logs = data.data; 
+                            } 
+                        })
+                    })
+                }
+            },
+            created() {
+                this.loadData();
+            }
+        })
+    </script>
+</body>
+</html>
